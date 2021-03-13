@@ -7,8 +7,9 @@ char msg[6] = "hello";
 RF24 radio(7,8);
 //const uint64_t pipe = 0xE8E8F0F0E1LL;
 RF24Network network(radio);
-const uint16_t this_node = 00;
-const uint16_t node01 = 01;
+const uint16_t this_node = 01;
+//const uint16_t this_node = 02;
+const uint16_t node01 = 00;
 struct SensorData {
   float temp;
   float pres;
@@ -35,5 +36,5 @@ void loop(void) {
   //bool ok = network.write(header, &msg, sizeof(msg));
   bool ok = network.write(header, &Sensor, sizeof(Sensor));
   Serial.println(ok);
-  //delay(3000);
+  delay(10000);
 }

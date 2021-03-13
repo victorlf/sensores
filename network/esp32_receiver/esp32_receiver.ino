@@ -8,7 +8,7 @@ char msg[6];
 RF24 radio(4, 5);
 RF24Network network(radio);
 //const uint64_t p = 0xE8E8F0F0E1LL;
-const uint16_t this_node = 01;
+const uint16_t this_node = 00;
 struct SensorData {
   float temp;
   float pres;
@@ -34,6 +34,8 @@ void loop(void){
     char incomingData[6];
     //network.read(header, &incomingData, sizeof(incomingData));
     network.read(header, &Sensor, sizeof(Sensor));
+    Serial.print("Header: ");
+    Serial.println(header.from_node);
     Serial.print("Temp: ");
     Serial.println(Sensor.temp);
     Serial.print("Pres: ");
