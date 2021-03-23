@@ -2,38 +2,42 @@
 #include "nRF24L01.h"
 #include "RF24.h"
 #include <RF24Network.h>
+//===========================================
+#include <Adafruit_Sensor.h>
+#include <Adafruit_BMP280.h>
 
-char msg[6] = "hello";
+
 RF24 radio(7,8);
-//const uint64_t pipe = 0xE8E8F0F0E1LL;
 RF24Network network(radio);
-const uint16_t this_node = 01;
-//const uint16_t this_node = 02;
+//const uint16_t this_node = 01;
+const uint16_t this_node = 02;
 const uint16_t node01 = 00;
 struct SensorData {
   float temp;
   float pres;
 } Sensor;
+//===========================================
+Adafruit_BMP280 bmp; //OBJETO DO TIPO Adafruit_BMP280 (I2C)
 
 void setup(void) {
   Serial.begin(115200);
   SPI.begin();
+  if(!bmp.begin(0x76)){ //SE O SENSOR NÃO FOR INICIALIZADO NO ENDEREÇO I2C 0x76, FAZ
+    Serial.println(F("Sensor BMP280 não foi identificado! Verifique as conexões."));
+    while(1);
+  }
   radio.begin();
   network.begin(90, this_node);
-//  radio.setChannel(2);
-//  radio.setPayloadSize(7);
-//  radio.setDataRate(RF24_250KBPS);
-//  radio.openWritingPipe(pipe);
 }
 void loop(void) {
   Serial.println("send ...");
-  //radio.write(msg, 6);
-  //delay(3000);
-  Sensor.temp = 12.3;
-  Sensor.pres = 45.6;
+  Sensor.temp = bmp.readTemperature();
+  Sensor.pres = bmp.readPressure()*0.01;
+  Serial.println(Sensor.temp);
+  Serial.println(Sensor.pres);
+  Serial.println("sending...");
   network.update();
   RF24NetworkHeader header(node01);
-  //bool ok = network.write(header, &msg, sizeof(msg));
   bool ok = network.write(header, &Sensor, sizeof(Sensor));
   Serial.println(ok);
   delay(10000);

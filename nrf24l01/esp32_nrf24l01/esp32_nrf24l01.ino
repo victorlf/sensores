@@ -6,13 +6,17 @@
 #include <HTTPClient.h>
 
 char msg[6];
-RF24 radio(12, 14, 26, 25, 27);
+//RF24 radio(12, 14, 26, 25, 27);
+RF24 radio(4, 5);
 const uint64_t p = 0xE8E8F0F0E1LL;
 //========================
 const char* ssid = "Virus";
+//const char* ssid = "AndroidAP";
 const char* password = "qwertF0ns3c4";
-//String serverName = "http://192.168.0.8:8090/postjson";
-String serverName = "http://159.89.36.81/postjson";
+//const char* password = "gaif2892";
+String serverName = "http://192.168.0.8:8090/postjson";
+//String serverName = "http://159.89.36.81/postjson";
+//String serverName = "http://152.84.251.21/postjson";
 // the following variables are unsigned longs because the time, measured in
 // milliseconds, will quickly become a bigger number than can be stored in an int.
 unsigned long lastTime = 0;
