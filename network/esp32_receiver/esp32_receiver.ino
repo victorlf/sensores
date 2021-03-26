@@ -15,13 +15,17 @@ const uint16_t this_node = 00;
 struct SensorData {
   float temp;
   float pres;
+  float volt;
 } Sensor;
 //========================
-const char* ssid = "Virus";
+//const char* ssid = "Virus";
 //const char* ssid = "AndroidAP";
-const char* password = "qwertF0ns3c4";
+const char* ssid = "CBPF-IoT";
+//const char* password = "qwertF0ns3c4";
 //const char* password = "gaif2892";
-String serverName = "http://192.168.0.8:8090/postjson";
+const char* password = "i20ocbt7";
+//String serverName = "http://192.168.0.8:8090/postjson";
+String serverName = "http://10.10.156.33:8090/postjson";
 //String serverName = "http://159.89.36.81/postjson";
 //String serverName = "http://152.84.251.21/postjson";
 // the following variables are unsigned longs because the time, measured in
@@ -65,6 +69,8 @@ void loop(void){
     Serial.println(Sensor.temp);
     Serial.print("Pres: ");
     Serial.println(Sensor.pres);
+    Serial.print("Volt: ");
+    Serial.println(Sensor.volt);
     //delay(1000);
     //Send an HTTP POST
     //if ((millis() - lastTime) > timerDelay) {
@@ -88,6 +94,9 @@ void loop(void){
         json += F("\",");
         json += F("\"pressure\":\"");
         json += String(Sensor.pres, 2);
+        json += F("\",");
+        json += F("\"voltage\":\"");
+        json += String(Sensor.volt, 2);
         json += F("\"");
         json += F("}");
   

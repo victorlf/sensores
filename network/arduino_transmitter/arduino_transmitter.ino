@@ -5,6 +5,8 @@
 //===========================================
 #include <Adafruit_Sensor.h>
 #include <Adafruit_BMP280.h>
+//===========================================
+#define ANALOGBATTERY A0
 
 
 RF24 radio(7,8);
@@ -15,9 +17,15 @@ const uint16_t node01 = 00;
 struct SensorData {
   float temp;
   float pres;
+  float volt;
 } Sensor;
 //===========================================
 Adafruit_BMP280 bmp; //OBJETO DO TIPO Adafruit_BMP280 (I2C)
+//===========================================
+// Variables
+int analogValue = 0;
+float voltage = 0;
+float refValue = 5.0 / 1024.0;
 
 void setup(void) {
   Serial.begin(115200);
@@ -30,9 +38,18 @@ void setup(void) {
   network.begin(90, this_node);
 }
 void loop(void) {
-  Serial.println("send ...");
+  //Serial.println("send ...");
   Sensor.temp = bmp.readTemperature();
   Sensor.pres = bmp.readPressure()*0.01;
+  
+  analogValue = analogRead(ANALOGBATTERY);
+  Serial.print("Analog Value: ");
+  Serial.println(analogValue);
+  voltage = refValue * analogValue;
+  Sensor.volt = voltage;
+  
+  Serial.print("Voltage: ");
+  Serial.println(voltage);
   Serial.println(Sensor.temp);
   Serial.println(Sensor.pres);
   Serial.println("sending...");
