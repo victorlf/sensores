@@ -15,6 +15,7 @@ const uint16_t this_node = 00;
 struct SensorData {
   float temp;
   float pres;
+  float hum;
   float volt;
 } Sensor;
 //========================
@@ -25,7 +26,7 @@ const char* ssid = "CBPF-IoT";
 //const char* password = "gaif2892";
 const char* password = "i20ocbt7";
 //String serverName = "http://192.168.0.8:8090/postjson";
-String serverName = "http://10.10.156.33:8090/postjson";
+String serverName = "http://10.10.0.223:8090/postjson";
 //String serverName = "http://159.89.36.81/postjson";
 //String serverName = "http://152.84.251.21/postjson";
 // the following variables are unsigned longs because the time, measured in
@@ -34,7 +35,7 @@ unsigned long lastTime = 0;
 // Timer set to 10 minutes (600000)
 //unsigned long timerDelay = 600000;
 // Set timer to 5 seconds (5000)
-unsigned long timerDelay = 0000;
+//unsigned long timerDelay = 0000;
 
 void setup(void){
  Serial.begin(115200);
@@ -69,6 +70,9 @@ void loop(void){
     Serial.println(Sensor.temp);
     Serial.print("Pres: ");
     Serial.println(Sensor.pres);
+    Serial.print("Hum: ");
+    Serial.print(Sensor.hum);
+    Serial.println(" %");
     Serial.print("Volt: ");
     Serial.println(Sensor.volt);
     //delay(1000);
@@ -95,6 +99,9 @@ void loop(void){
         json += F("\"pressure\":\"");
         json += String(Sensor.pres, 2);
         json += F("\",");
+        json += F("\"humidity\":\"");
+        json += String(Sensor.hum, 2);
+        json += F("\",");
         json += F("\"voltage\":\"");
         json += String(Sensor.volt, 2);
         json += F("\"");
@@ -120,8 +127,15 @@ void loop(void){
       else {
         Serial.println("WiFi Disconnected");
       }
-      lastTime = millis();
+      //lastTime = millis();
     //}
+  }
+
+  lastTime = millis();
+
+  if (lastTime >= 14400000) {
+    Serial.println("Restarting...");
+    ESP.restart();
   }
   
   delay(1000);

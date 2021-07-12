@@ -6,21 +6,30 @@
 #include <Adafruit_Sensor.h>
 #include <Adafruit_BMP280.h>
 //===========================================
+// Adafruit_DHT library will be included
+#include "DHT.h"
+#define DHTPIN 3
+// The sensor will be initialized here
+#define DHTTYPE DHT11   // DHT 11
+//===========================================
 #define ANALOGBATTERY A0
 
 
 RF24 radio(7,8);
 RF24Network network(radio);
-//const uint16_t this_node = 01;
-const uint16_t this_node = 02;
+const uint16_t this_node = 01;
+//const uint16_t this_node = 02;
 const uint16_t node01 = 00;
 struct SensorData {
   float temp;
   float pres;
+  float hum;
   float volt;
 } Sensor;
 //===========================================
 Adafruit_BMP280 bmp; //OBJETO DO TIPO Adafruit_BMP280 (I2C)
+//===========================================
+DHT dht(DHTPIN, DHTTYPE);
 //===========================================
 // Variables
 int analogValue = 0;
@@ -34,6 +43,7 @@ void setup(void) {
     Serial.println(F("Sensor BMP280 não foi identificado! Verifique as conexões."));
     while(1);
   }
+  dht.begin();
   radio.begin();
   network.begin(90, this_node);
 }
@@ -41,6 +51,7 @@ void loop(void) {
   //Serial.println("send ...");
   Sensor.temp = bmp.readTemperature();
   Sensor.pres = bmp.readPressure()*0.01;
+  Sensor.hum = dht.readHumidity();
   
   analogValue = analogRead(ANALOGBATTERY);
   Serial.print("Analog Value: ");
@@ -52,10 +63,12 @@ void loop(void) {
   Serial.println(voltage);
   Serial.println(Sensor.temp);
   Serial.println(Sensor.pres);
+  Serial.print(Sensor.hum);
+  Serial.println(" %");
   Serial.println("sending...");
   network.update();
   RF24NetworkHeader header(node01);
   bool ok = network.write(header, &Sensor, sizeof(Sensor));
   Serial.println(ok);
-  delay(10000);
+  delay(300000);
 }
