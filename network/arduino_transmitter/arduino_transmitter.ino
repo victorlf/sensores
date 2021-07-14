@@ -13,6 +13,8 @@
 #define DHTTYPE DHT11   // DHT 11
 //===========================================
 #define ANALOGBATTERY A0
+//=============================================
+
 
 
 RF24 radio(7,8);
@@ -38,6 +40,9 @@ float refValue = 5.0 / 1024.0;
 
 void setup(void) {
   Serial.begin(115200);
+  pinMode(5, OUTPUT);
+  digitalWrite(5, HIGH);
+  Serial.print("Start setup");
   SPI.begin();
   if(!bmp.begin(0x76)){ //SE O SENSOR NÃO FOR INICIALIZADO NO ENDEREÇO I2C 0x76, FAZ
     Serial.println(F("Sensor BMP280 não foi identificado! Verifique as conexões."));
@@ -46,8 +51,11 @@ void setup(void) {
   dht.begin();
   radio.begin();
   network.begin(90, this_node);
+  Serial.print("Finish setup");
 }
 void loop(void) {
+  //digitalWrite(5, LOW);
+  digitalWrite(5, HIGH);
   //Serial.println("send ...");
   Sensor.temp = bmp.readTemperature();
   Sensor.pres = bmp.readPressure()*0.01;
@@ -70,5 +78,6 @@ void loop(void) {
   RF24NetworkHeader header(node01);
   bool ok = network.write(header, &Sensor, sizeof(Sensor));
   Serial.println(ok);
-  delay(300000);
+  digitalWrite(5, LOW);
+  delay(5000);
 }

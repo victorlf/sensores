@@ -6,10 +6,17 @@
 #include <Adafruit_Sensor.h>
 #include <Adafruit_BMP280.h>
 //===========================================
+// Adafruit_DHT library will be included
+#include "DHT.h"
+#define DHTPIN 3
+// The sensor will be initialized here
+#define DHTTYPE DHT11   // DHT 11
+//===========================================
 #include "LowPower.h"
 //===========================================
 #define ANALOGBATTERY A0
 #define SENSORSPOWER 5
+#define DHTPOWER 4
 
 
 RF24 radio(7,8);
@@ -20,10 +27,13 @@ const uint16_t node01 = 00;
 struct SensorData {
   float temp;
   float pres;
+  float hum;
   float volt;
 } Sensor;
 //===========================================
 Adafruit_BMP280 bmp; //OBJETO DO TIPO Adafruit_BMP280 (I2C)
+//===========================================
+DHT dht(DHTPIN, DHTTYPE);
 //===========================================
 // Variables
 int analogValue = 0;
@@ -45,18 +55,22 @@ void nrf_setup() {
 void setup() {
   Serial.begin(115200);
   SPI.begin();
+  dht.begin();
   Serial.print("dsdsd");
   
   // Init sensors Power Supply
   pinMode(SENSORSPOWER, OUTPUT);
+  pinMode(DHTPOWER, OUTPUT);
   //digitalWrite(SENSORSPOWER, HIGH);
   //delay(1000);
 }
 void loop() {
   digitalWrite(SENSORSPOWER, LOW);
+  digitalWrite(DHTPOWER, LOW);
   LowPower.powerDown(SLEEP_8S, ADC_OFF, BOD_OFF);
   
   digitalWrite(SENSORSPOWER, HIGH);
+  digitalWrite(DHTPOWER, HIGH);
   delay(1000);
   bmp_setup();
   nrf_setup();
@@ -64,6 +78,7 @@ void loop() {
   //Serial.println("send ...");
   Sensor.temp = bmp.readTemperature();
   Sensor.pres = bmp.readPressure()*0.01;
+  Sensor.hum = dht.readHumidity();
   
   analogValue = analogRead(ANALOGBATTERY);
   Serial.print("Analog Value: ");
@@ -75,12 +90,14 @@ void loop() {
   Serial.println(voltage);
   Serial.println(Sensor.temp);
   Serial.println(Sensor.pres);
+  Serial.print(Sensor.hum);
+  Serial.println(" %");
   Serial.println("sending...");
   network.update();
   RF24NetworkHeader header(node01);
   bool ok = network.write(header, &Sensor, sizeof(Sensor));
   Serial.println(ok);
-  //delay(10000);
+  delay(10000);
   
   // End sensors Power Supply
 //  digitalWrite(SENSORSPOWER, LOW);
