@@ -67,11 +67,14 @@ void setup() {
 void loop() {
   digitalWrite(SENSORSPOWER, LOW);
   digitalWrite(DHTPOWER, LOW);
-  LowPower.powerDown(SLEEP_8S, ADC_OFF, BOD_OFF);
-  
+  //for (int i = 0; i < 75; i++) { // 600 seg = 10 min
+  for (int i = 0; i < 8; i++) { // 64 seg
+    //Serial.println("oi");
+    LowPower.powerDown(SLEEP_8S, ADC_OFF, BOD_OFF);
+  }
   digitalWrite(SENSORSPOWER, HIGH);
   digitalWrite(DHTPOWER, HIGH);
-  delay(1000);
+  delay(10000);
   bmp_setup();
   nrf_setup();
   
@@ -96,9 +99,12 @@ void loop() {
   network.update();
   RF24NetworkHeader header(node01);
   bool ok = network.write(header, &Sensor, sizeof(Sensor));
-  Serial.println(ok);
-  delay(10000);
-  
+  if (ok == true){
+    Serial.println("Sent!");
+  } else {
+    Serial.println("Didn't sent!");  
+  }
+  //delay(10000);
   // End sensors Power Supply
 //  digitalWrite(SENSORSPOWER, LOW);
 }
